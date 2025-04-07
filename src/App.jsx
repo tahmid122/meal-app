@@ -1,35 +1,51 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
-
+import { Suspense, useEffect, useState } from "react";
+import "./App.css";
+import Categories from "./components/Categories";
+import { NavBar } from "./components/NavBar";
+import ShowCategoryItems from "./components/ShowCategoryItems";
+import ImageHolder from "./components/ImageHolder";
+const categoriesPromise = fetch(
+  "https://www.themealdb.com/api/json/v1/1/categories.php"
+).then((res) => res.json());
 function App() {
-  const [count, setCount] = useState(0)
-
+  const [category, setCategory] = useState("");
+  const [foods, setFoods] = useState([]);
+  const [imageTrue, setImageTrue] = useState({ image: "", isTrue: false });
+  useEffect(() => {
+    fetch(`https://www.themealdb.com/api/json/v1/1/filter.php?c=${category}`)
+      .then((res) => res.json())
+      .then((data) => setFoods(data.meals));
+  }, [category]);
   return (
     <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
+      <NavBar />
+      <Suspense fallback={<h1>Categories are loading.....</h1>}>
+        <Categories
+          categoriesPromise={categoriesPromise}
+          setCategory={setCategory}
+        />
+      </Suspense>
+      {imageTrue.isTrue ? (
+        <ImageHolder setImageTrue={setImageTrue} imageTrue={imageTrue} />
+      ) : (
+        ""
+      )}
+
+      <Suspense fallback={<h1>Food is loading....</h1>}>
+        {foods ? (
+          <ShowCategoryItems
+            foods={foods}
+            setImageTrue={setImageTrue}
+            imageTrue={imageTrue}
+          />
+        ) : (
+          <h1 className="font-bold text-xl text-center mt-5">
+            Foods here. Please click on any category.
+          </h1>
+        )}
+      </Suspense>
     </>
-  )
+  );
 }
 
-export default App
+export default App;
