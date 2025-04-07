@@ -3,7 +3,7 @@ import React, { useState } from "react";
 const ShowCategoryItems = ({ foods, setImageTrue, imageTrue }) => {
   const [foodName, setFoodName] = useState("");
   return (
-    <div className="p-5 grid grid-cols-4 gap-5 ">
+    <div className="p-5 grid grid-cols-1 lg:grid-cols-4 gap-5 ">
       {foods?.map((food) => {
         const { idMeal, strMeal, strMealThumb } = food;
         return (
